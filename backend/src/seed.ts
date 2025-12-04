@@ -28,7 +28,7 @@ const seedData = async () => {
         apy: 5.2,
         tvl: '$1.2B',
         risk: 'Medium',
-        adapterAddress: '0xb8152050eCd324186eC1704fD0dF7853380A6aa7',
+        adapterAddress: '0x5e01a1cBdfddA63D20d74E121B778d87A5AC0178',
         isActive: true,
         network: 'sepolia'
       },
@@ -39,7 +39,7 @@ const seedData = async () => {
         apy: 3.8,
         tvl: '$15B',
         risk: 'Low',
-        adapterAddress: '0x8fEB6f4aA42Aec109b5a95A2653297A01Ef1340A',
+        adapterAddress: '0x1D42Ad1bdb32bEb309F184C3AA0D5BA7B8Bd3f6F',
         isActive: true,
         network: 'sepolia'
       },
@@ -50,7 +50,7 @@ const seedData = async () => {
         apy: 2.1,
         tvl: '$4B',
         risk: 'Low',
-        adapterAddress: '0xcee40f6aEC2b17E5b3BBB46AAdd3103C0Eb6eA46',
+        adapterAddress: '0xFbe1cE67358c2333663738020F861438B7FAe929',
         isActive: true,
         network: 'sepolia'
       },
