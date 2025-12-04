@@ -175,7 +175,7 @@ export default function PositionsPage() {
                         decimals={2} 
                         duration={1}
                         separator=","
-                      />
+                      /> <span className="text-lg text-[var(--color-text-muted)]">USDC</span>
                     </>
                   )}
                 </div>
@@ -300,30 +300,47 @@ export default function PositionsPage() {
                       </div>
                     </div>
 
-                    {/* Right: Actions */}
-                    <div className="flex items-center justify-end gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
+                    {/* Middle: Value in USD/Token */}
+                    <div className="flex flex-col items-end gap-1 border-t border-white/5 pt-4 sm:border-0 sm:pt-0">
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-[var(--color-text-main)]">
+                          {prices[tx.token] ? (
+                            <>
+                              ${(parseFloat(tx.amount) * prices[tx.token]).toLocaleString('en-US', { 
+                                minimumFractionDigits: 2, 
+                                maximumFractionDigits: 2 
+                              })} <span className="text-sm text-[var(--color-text-muted)]">USDC</span>
+                            </>
+                          ) : (
+                            <span className="text-[var(--color-text-muted)]">-</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-[var(--color-text-dim)]">
+                          {tx.amount} {tx.token}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Icon Actions */}
+                    <div className="flex items-center justify-end gap-2">
+                      <button
                         onClick={() => {
                           setSelectedPosition({ ...tx, apy: currentApy });
                           setIsUnstakeModalOpen(true);
                         }}
-                        className="group relative overflow-hidden border-blue-500/30 bg-gradient-to-r from-blue-500/10 to-purple-500/10 hover:from-blue-500/20 hover:to-purple-500/20 hover:border-blue-400/50 transition-all duration-300"
+                        className="group relative h-10 w-10 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 hover:from-blue-500/20 hover:to-purple-500/20 hover:border-blue-400/50 transition-all duration-300 flex items-center justify-center"
+                        title="Manage Position"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-                        <div className="relative flex items-center gap-2">
-                          <ArrowDownCircle className="h-3.5 w-3.5 group-hover:rotate-180 transition-transform duration-500" />
-                          <span className="font-medium">Manage</span>
-                        </div>
-                      </Button>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 rounded-lg" />
+                        <ArrowDownCircle className="relative h-4 w-4 text-blue-400 group-hover:rotate-180 transition-transform duration-500" />
+                      </button>
                       <a
                         href={`https://sepolia.etherscan.io/tx/${tx.txHash}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-[var(--color-text-muted)] transition-colors hover:bg-white/10 hover:text-[var(--color-text-main)]"
+                        className="h-10 w-10 rounded-lg bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-main)]"
+                        title="View on Etherscan"
                       >
-                        <span>View on Explorer</span>
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </div>
