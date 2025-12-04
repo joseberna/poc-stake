@@ -138,9 +138,52 @@ export function useStake() {
       logger.info('Stake tx sent, waiting for confirmation...', { component: 'useStake', txHash: stakeTx });
       setTxHash(stakeTx);
 
-      // Wait for transaction receipt (confirmation)
+      // Wait for transaction receipt with longer timeout and retry logic
       logger.info('Waiting for transaction receipt...', { component: 'useStake', txHash: stakeTx });
-      const receipt = await publicClient.waitForTransactionReceipt({ hash: stakeTx });
+      
+      let receipt;
+      let retries = 0;
+      const maxRetries = 3;
+      
+      while (retries < maxRetries) {
+        try {
+          receipt = await publicClient.waitForTransactionReceipt({ 
+            hash: stakeTx,
+            timeout: 120_000, // 2 minutes timeout (increased from default 12s)
+            pollingInterval: 2_000, // Check every 2 seconds
+          });
+          break; // Success, exit retry loop
+        } catch (error: any) {
+          retries++;
+          if (retries >= maxRetries) {
+            // After max retries, check if transaction exists on chain
+            logger.warn('Max retries reached, checking transaction status...', { 
+              component: 'useStake', 
+              txHash: stakeTx,
+              retries 
+            });
+            
+            // Try one more time with even longer timeout
+            receipt = await publicClient.waitForTransactionReceipt({ 
+              hash: stakeTx,
+              timeout: 180_000, // 3 minutes final attempt
+            });
+          } else {
+            logger.warn('Receipt fetch failed, retrying...', { 
+              component: 'useStake', 
+              txHash: stakeTx,
+              retry: retries,
+              error: error.message 
+            });
+            // Wait a bit before retry
+            await new Promise(resolve => setTimeout(resolve, 3000));
+          }
+        }
+      }
+      
+      if (!receipt) {
+        throw new Error('Failed to get transaction receipt after multiple attempts');
+      }
       
       logger.info('Transaction receipt received', { 
         component: 'useStake', 
