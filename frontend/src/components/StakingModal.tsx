@@ -70,7 +70,7 @@ export function StakingModal({ option, isOpen, onClose, onConfirm, isLoading }: 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={isLoading ? undefined : onClose}
             className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
           />
 
@@ -83,13 +83,15 @@ export function StakingModal({ option, isOpen, onClose, onConfirm, isLoading }: 
               className="w-full max-w-md"
             >
               <Card className="relative">
-                {/* Close Button */}
-                <button
-                  onClick={onClose}
-                  className="absolute right-4 top-4 rounded-lg p-2 text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--color-text-main)]"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                {/* Close Button - Hidden during loading */}
+                {!isLoading && (
+                  <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 rounded-lg p-2 text-[var(--color-text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--color-text-main)]"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                )}
 
                 {/* Header */}
                 <div className="mb-6 flex items-center gap-4">
