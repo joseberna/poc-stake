@@ -31,7 +31,14 @@ contract MockAdapter is IAdapter {
     }
 
     function stake(address token, uint256 amount, address onBehalfOf) external payable override returns (uint256) {
-        // For PoC, we assume 1:1 exchange rate
+        // Transfer tokens from caller (StakingRouter) to this adapter
+        if (token != address(0)) {
+            // ERC20 token
+            IERC20(token).transferFrom(msg.sender, address(this), amount);
+        }
+        // For ETH, it's already sent via msg.value
+        
+        // Mint receipt tokens to user (1:1 ratio for PoC)
         receiptToken.mint(onBehalfOf, amount);
         return amount;
     }
@@ -40,11 +47,7 @@ contract MockAdapter is IAdapter {
         // Burn receipt tokens from the caller
         receiptToken.burn(msg.sender, amount);
         
-        // For PoC, we assume 1:1 exchange rate
-        // In production, this would withdraw from the actual protocol
-        // and transfer the underlying tokens back to the user
-        
-        // Transfer tokens back to user
+        // Transfer underlying tokens back to user
         if (token == address(0)) {
             // ETH
             payable(to).transfer(amount);
