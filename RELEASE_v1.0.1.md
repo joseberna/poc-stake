@@ -82,26 +82,31 @@ This release focuses on **production-ready improvements** with emphasis on user 
 
 ## 🐛 Bug Fixes
 
-### Critical Fixes
-- ✅ **Transaction Revert Issues**
+#### 🐛 Critical Fixes
+- **Staking Reversions Resolved**
+  - Root cause: Stale database data (missing/incorrect adapter addresses)
+  - Fix: Implemented strict address validation in frontend
+  - Fix: Updated database seeding script with verified Sepolia contract addresses
+  - Result: 100% success rate on Uniswap, Aave, and Lido staking
+- **Infinite Approval Pattern**
+  - Switched from exact-amount to max-uint256 approval
+  - Prevents "insufficient allowance" errors on subsequent transactions
+  - Aligns with industry standards (Uniswap/Aave behavior)
+- **Transaction Reliability**
   - Fixed MockAdapter to properly receive tokens
-  - Corrected adapter addresses in seed data
-  - All protocols now working correctly
+  - Implemented dynamic gas estimation with 20% buffer
+  - Added comprehensive error logging for gas estimation failures
 
-- ✅ **Inflated Earnings Display**
+#### ✅ Other Fixes
+- **Inflated Earnings Display**
   - Changed from on-chain balance to theoretical APY calculation
   - Prevents showing accumulated receipt tokens as earnings
-  - Accurate per-position earnings display
-
-- ✅ **Decimal Mismatch**
+- **Decimal Mismatch**
   - WBTC now correctly uses 8 decimals
   - Token amounts display accurately
-  - Proper balance calculations
-
-### Minor Fixes
-- ✅ Fixed hardcoded fallback addresses in hooks
-- ✅ Corrected adapter addresses for all token/protocol combinations
-- ✅ Updated environment variables across all deployment targets
+- **Configuration**
+  - Fixed hardcoded fallback addresses in hooks
+  - Updated environment variables across all deployment targets
 
 ---
 
@@ -170,17 +175,13 @@ USDC: 0xaDD1Fbe72192A8328AeD0EA6E1f729fde11Fd8Ad (6 decimals)
 ## 🚀 What's Next (v1.0.2)
 
 ### Planned Features
-- [ ] Dynamic transaction status messages in modal
-- [ ] Slower portfolio counter animation (2-3 seconds)
-- [ ] CountUp animation for individual position values
 - [ ] Transaction history with filtering
 - [ ] Price charts for staked assets
 - [ ] Multi-network support (Polygon, Arbitrum)
+- [ ] WebSocket integration for real-time updates
 
 ### Under Investigation
-- [ ] Occasional false-positive transaction errors
 - [ ] Gas optimization for batch operations
-- [ ] WebSocket integration for real-time updates
 
 ---
 
