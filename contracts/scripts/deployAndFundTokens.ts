@@ -23,7 +23,7 @@ async function main() {
   for (const tokenConfig of tokens) {
     console.log(`\n🪙 Deploying ${tokenConfig.symbol}...`);
     
-    const token = await MockERC20.deploy(tokenConfig.name, tokenConfig.symbol);
+    const token = await MockERC20.deploy(tokenConfig.name, tokenConfig.symbol, tokenConfig.decimals);
     await token.waitForDeployment();
     const tokenAddress = await token.getAddress();
     

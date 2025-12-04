@@ -50,7 +50,7 @@ async function main() {
   // Deploy Mock WBTC
   console.log("\n📦 Deploying Mock WBTC...");
   const MockERC20 = await ethers.getContractFactory("MockERC20");
-  const wbtc = await MockERC20.deploy("Wrapped BTC", "WBTC");
+  const wbtc = await MockERC20.deploy("Wrapped BTC", "WBTC", 8);
   await wbtc.waitForDeployment();
   const wbtcAddress = await wbtc.getAddress();
   console.log("✅ Mock WBTC deployed to:", wbtcAddress);
