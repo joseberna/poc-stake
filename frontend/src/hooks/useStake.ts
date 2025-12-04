@@ -90,32 +90,57 @@ export function useStake() {
     }
 
     setError(null);
-    setCurrentStep('approving');
+    setError(null);
 
     try {
       const tokenAddress = TOKEN_ADDRESSES[option.token];
       const decimals = TOKEN_DECIMALS[option.token] || 18;
       const amountWei = parseUnits(amount, decimals);
 
-      // Step 1: Approve
-      // Use infinite approval (max uint256) - common DeFi pattern
-      // This prevents issues with multiple stakes and reduces gas costs for future stakes
-      const maxApproval = BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+      // Step 1: Check Allowance
+      logger.info('Checking current allowance...', { component: 'useStake', tokenAddress });
       
-      logger.info('Approving token spend (infinite)...', { component: 'useStake', action: 'approve', tokenAddress });
-      const approveTx = await writeContractAsync({
+      const currentAllowance = await publicClient.readContract({
         address: tokenAddress,
         abi: ERC20_ABI,
-        functionName: 'approve',
-        args: [STAKING_ROUTER_ADDRESS, maxApproval],
-        gas: BigInt(100000), 
-      });
+        functionName: 'allowance',
+        args: [address, STAKING_ROUTER_ADDRESS]
+      }) as bigint;
 
-      logger.success('Approval tx sent', { component: 'useStake', txHash: approveTx });
+      if (currentAllowance < amountWei) {
+        setCurrentStep('approving');
+        // Use infinite approval (max uint256) - common DeFi pattern
+        const maxApproval = BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        
+        logger.info('Approving token spend (infinite)...', { component: 'useStake', action: 'approve', tokenAddress });
+        const approveTx = await writeContractAsync({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'approve',
+          args: [STAKING_ROUTER_ADDRESS, maxApproval],
+          gas: BigInt(100000), 
+        });
 
-      // Wait for approval confirmation
-      await publicClient.waitForTransactionReceipt({ hash: approveTx });
-      logger.success('Approval confirmed', { component: 'useStake', txHash: approveTx });
+        logger.success('Approval tx sent', { component: 'useStake', txHash: approveTx });
+
+        // Wait for approval confirmation
+        await publicClient.waitForTransactionReceipt({ hash: approveTx });
+        logger.success('Approval confirmed', { component: 'useStake', txHash: approveTx });
+        
+        // Double check allowance after approval to ensure node consistency
+        const newAllowance = await publicClient.readContract({
+          address: tokenAddress,
+          abi: ERC20_ABI,
+          functionName: 'allowance',
+          args: [address, STAKING_ROUTER_ADDRESS]
+        }) as bigint;
+        
+        if (newAllowance < amountWei) {
+          throw new Error('Approval failed or not yet propagated. Please try again.');
+        }
+      } else {
+        logger.info('Allowance sufficient, skipping approval', { component: 'useStake', currentAllowance: currentAllowance.toString() });
+      }
 
       // Step 2: Stake
       setCurrentStep('staking');
