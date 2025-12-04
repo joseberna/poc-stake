@@ -98,13 +98,16 @@ export function useStake() {
       const amountWei = parseUnits(amount, decimals);
 
       // Step 1: Approve
-      // All tokens in this PoC (WETH, WBTC, MockSOL) are ERC20s and require approval
-      logger.info('Approving token spend...', { component: 'useStake', action: 'approve', tokenAddress });
+      // Use infinite approval (max uint256) - common DeFi pattern
+      // This prevents issues with multiple stakes and reduces gas costs for future stakes
+      const maxApproval = BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+      
+      logger.info('Approving token spend (infinite)...', { component: 'useStake', action: 'approve', tokenAddress });
       const approveTx = await writeContractAsync({
         address: tokenAddress,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [STAKING_ROUTER_ADDRESS, amountWei],
+        args: [STAKING_ROUTER_ADDRESS, maxApproval],
         gas: BigInt(100000), 
       });
 
