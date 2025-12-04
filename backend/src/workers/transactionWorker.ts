@@ -1,6 +1,6 @@
 import { Worker, Job } from 'bullmq';
 import { Redis } from 'ioredis';
-import { StakingTransaction } from '../models/StakingTransaction';
+import StakingTransaction from '../models/StakingTransaction';
 import logger from '../utils/logger';
 
 const redisConnection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
@@ -32,7 +32,7 @@ export const transactionWorker = new Worker<StakeEventData | UnstakeEventData>(
     const { txHash, userAddress, protocol, token, amount, blockNumber } = job.data;
     const jobName = job.name;
     
-    logger.info(`Processing ${jobName} event for tx: ${txHash}`, { service: 'TransactionWorker', jobId: job.id });
+    logger.info(`Processing ${jobName} event for tx: ${txHash}`, { service: 'TransactionWorker' });
 
     try {
       if (jobName === 'process-stake') {

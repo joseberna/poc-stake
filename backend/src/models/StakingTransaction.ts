@@ -7,10 +7,12 @@ export interface IStakingTransaction extends Document {
   protocol: string;
   adapterAddress: string;
   txHash: string;
-  status: 'pending' | 'confirmed' | 'failed';
+  status: 'pending' | 'confirmed' | 'failed' | 'unstaked';
   fee: string;
   timestamp: Date;
   network: string;
+  unstakeTxHash?: string;
+  unstakedAt?: Date;
 }
 
 const StakingTransactionSchema: Schema = new Schema({
@@ -20,10 +22,12 @@ const StakingTransactionSchema: Schema = new Schema({
   protocol: { type: String, required: true },
   adapterAddress: { type: String, required: true },
   txHash: { type: String, required: true, unique: true },
-  status: { type: String, enum: ['pending', 'confirmed', 'failed'], default: 'pending' },
+  status: { type: String, enum: ['pending', 'confirmed', 'failed', 'unstaked'], default: 'pending' },
   fee: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
-  network: { type: String, required: true }
+  network: { type: String, required: true },
+  unstakeTxHash: { type: String },
+  unstakedAt: { type: Date }
 });
 
 export default mongoose.model<IStakingTransaction>('StakingTransaction', StakingTransactionSchema);
