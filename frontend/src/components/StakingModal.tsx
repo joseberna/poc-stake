@@ -9,6 +9,7 @@ import { Tooltip } from './ui/Tooltip';
 import { X, AlertCircle, TrendingUp, Wallet } from 'lucide-react';
 import { StakingOption } from '@/hooks/useStakingOptions';
 import { useTokenBalance } from '@/hooks/useTokenBalance';
+import { LoadingAnimation } from './LoadingAnimation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface StakingModalProps {
@@ -122,8 +123,16 @@ export function StakingModal({ option, isOpen, onClose, onConfirm, isLoading }: 
                   </div>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Loading State */}
+                {isLoading ? (
+                  <LoadingAnimation 
+                    tokenIcon={TOKEN_ICONS[option.token] || '/icons/dedlyfi.png'}
+                    message="Processing your stake..."
+                    submessage="Please wait while we confirm your transaction on the blockchain"
+                  />
+                ) : (
+                  /* Form */
+                  <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Balance Display */}
                   <div className="flex items-center justify-between rounded-lg bg-[var(--color-bg-card)] p-3">
                     <div className="flex items-center gap-2 text-sm text-[var(--color-text-muted)]">
@@ -276,6 +285,7 @@ export function StakingModal({ option, isOpen, onClose, onConfirm, isLoading }: 
                     </Button>
                   </div>
                 </form>
+                )}
               </Card>
             </motion.div>
           </div>
