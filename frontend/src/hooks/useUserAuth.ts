@@ -12,7 +12,12 @@ export function useUserAuth() {
       if (!address || !isConnected) return;
 
       try {
-        logger.info('Registering user...', { component: 'useUserAuth', address });
+        logger.info('Registering user: '+ address, { component: 'useUserAuth', /**
+         * name
+         */
+        public name() {
+          
+        } });
 
         const response = await fetch(`${API_URL}/api/users/login`, {
           method: 'POST',

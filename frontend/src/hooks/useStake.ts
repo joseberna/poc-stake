@@ -155,12 +155,32 @@ export function useStake() {
         router: STAKING_ROUTER_ADDRESS
       });
 
+      // Estimate gas first to catch errors early and set proper limit
+      let gasLimit = BigInt(500000); // Fallback
+      try {
+        const estimatedGas = await publicClient.estimateContractGas({
+          address: STAKING_ROUTER_ADDRESS,
+          abi: STAKING_ROUTER_ABI,
+          functionName: 'stake',
+          args: [tokenAddress, amountWei, option.adapterAddress as Address],
+          account: address
+        });
+        // Add 20% buffer
+        gasLimit = (estimatedGas * BigInt(120)) / BigInt(100);
+        logger.info('Gas estimated:', { estimated: estimatedGas.toString(), limit: gasLimit.toString() });
+      } catch (gasError: any) {
+        logger.warn('Gas estimation failed, using fallback:', { error: gasError.message });
+        // If estimation fails, it usually means the tx will revert. 
+        // We'll let it proceed with fallback so user sees the real error, 
+        // or we could throw here.
+      }
+
       const stakeTx = await writeContractAsync({
         address: STAKING_ROUTER_ADDRESS,
         abi: STAKING_ROUTER_ABI,
         functionName: 'stake',
         args: [tokenAddress, amountWei, option.adapterAddress as Address],
-        gas: BigInt(500000), 
+        gas: gasLimit, 
       });
 
       logger.info('Stake tx sent, waiting for confirmation...', { component: 'useStake', txHash: stakeTx });

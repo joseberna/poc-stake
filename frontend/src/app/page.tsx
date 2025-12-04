@@ -10,6 +10,7 @@ import { Loader2, AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
+import { logger } from '@/utils/logger';
 
 export default function Home() {
   const { address, isConnected } = useAccount();
@@ -38,7 +39,7 @@ export default function Home() {
 
     try {
       const tx = await stake(selectedOption, amount);
-      
+
       // 🎉 Trigger confetti celebration
       confetti({
         particleCount: 100,
@@ -46,7 +47,7 @@ export default function Home() {
         origin: { y: 0.6 },
         colors: ['#60a5fa', '#a78bfa', '#10b981', '#f59e0b'],
       });
-      
+
       // Show success toast with crypto styling
       toast.success(
         (t) => (
@@ -57,7 +58,7 @@ export default function Home() {
               <p className="text-sm text-gray-300 mt-1">
                 {amount} {selectedOption.token} staked on {selectedOption.protocol}
               </p>
-              <a 
+              <a
                 href={`https://sepolia.etherscan.io/tx/${tx}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -68,7 +69,7 @@ export default function Home() {
             </div>
           </div>
         ),
-        { 
+        {
           duration: 7000,
           style: {
             background: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)',
@@ -77,10 +78,11 @@ export default function Home() {
           },
         }
       );
-      
+      logger.info('Stake successful td: ' + tx, { service: 'stake', method: 'handleConfirmStake' });
+
       setSelectedOption(null);
     } catch (error: any) {
-      console.error('Staking failed:', error);
+      logger.error('Staking failed: ' + error, { service: 'stake', method: 'handleConfirmStake' });
       toast.error(
         error?.message || 'Failed to stake. Please try again.',
         {
@@ -107,7 +109,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="mb-12 text-center">
@@ -116,7 +118,7 @@ export default function Home() {
             <span className="text-gradient">Securely</span>
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-[var(--color-text-muted)]">
-            Access the best yields in DeFi with our curated staking options. 
+            Access the best yields in DeFi with our curated staking options.
             Simple, secure, and transparent.
           </p>
         </div>
