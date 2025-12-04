@@ -1,12 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 
-// Only load .env file in development (Railway injects env vars directly)
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
+// In production (Railway), env vars are injected directly into process.env
+// In development, load from .env file
+if (process.env.NODE_ENV !== 'production' && !process.env.RAILWAY_ENVIRONMENT) {
+  require('dotenv').config();
 }
-
 
 import mongoose from 'mongoose';
 import swaggerUi from 'swagger-ui-express';
@@ -24,6 +23,15 @@ app.use(express.json());
 
 // Connect to MongoDB
 const mongoUri = process.env.MONGO_URI;
+
+// Debug: Log environment info
+console.log('=== ENVIRONMENT DEBUG ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('RAILWAY_ENVIRONMENT:', process.env.RAILWAY_ENVIRONMENT);
+console.log('MONGO_URI exists:', !!mongoUri);
+console.log('PORT:', process.env.PORT);
+console.log('========================');
+
 if (!mongoUri) {
   logger.error('MONGO_URI not found in environment variables', { service: 'Database' });
   process.exit(1);
