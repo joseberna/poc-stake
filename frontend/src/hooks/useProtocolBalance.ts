@@ -1,5 +1,6 @@
 import { useReadContract } from 'wagmi';
 import { STAKING_ROUTER_ABI } from '@/config/contracts';
+import { Address } from 'viem';
 
 export function useProtocolBalance(
   adapterAddress: string,
@@ -8,10 +9,10 @@ export function useProtocolBalance(
   stakingRouterAddress: string
 ) {
   const { data: balance, isError, isLoading, refetch } = useReadContract({
-    address: stakingRouterAddress as `0x${string}`,
+    address: stakingRouterAddress as Address,
     abi: STAKING_ROUTER_ABI,
     functionName: 'getProtocolBalance',
-    args: [adapterAddress, tokenAddress, userAddress],
+    args: [adapterAddress as Address, tokenAddress as Address, userAddress as Address],
     query: {
       enabled: !!adapterAddress && !!tokenAddress && !!userAddress && !!stakingRouterAddress,
       refetchInterval: 10000, // Refetch every 10 seconds for near real-time updates
@@ -25,3 +26,4 @@ export function useProtocolBalance(
     refetch
   };
 }
+
